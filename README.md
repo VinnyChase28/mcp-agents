@@ -72,3 +72,41 @@ Contributions are welcome! Please feel free to open an issue or submit a pull re
 ## License
 
 This project is licensed under the **MIT License**.
+
+## The Pillars of MCP Servers
+
+MCP (Model Context Protocol) servers are designed to extend the capabilities of AI models by providing structured, secure, and standardized access to external tools, data, and workflows. The core pillars of MCP servers can be summarized as follows:
+
+**1. Tools**
+
+- Tools are executable functions that AI models can invoke through the MCP protocol. Each tool has defined parameters and return values, allowing models to perform actions such as querying a database, sending an email, or manipulating files.
+- Tool invocation is typically controlled by explicit user approval or permissions, ensuring a human-in-the-loop for safety and oversight.
+
+**2. Resources**
+
+- Resources represent structured access to data—such as files, databases, APIs, or other information sources. MCP servers standardize how this data is exposed, so AI models do not need to understand the underlying structure; they simply request what they need via the MCP interface.
+- This abstraction layer enables secure and consistent data access across different environments.
+
+**3. Prompts**
+
+- Prompts are pre-defined templates or instructions for common tasks. They help standardize model behavior for specific workflows, making interactions more predictable and maintainable.
+- Prompts can guide the AI in how to approach certain problems or requests, improving reliability and reducing ambiguity.
+
+## Supporting Components
+
+In addition to the three main pillars, MCP servers rely on several supporting architectural components:
+
+- **Communication Layer:** Handles the MCP protocol, typically using JSON-RPC 2.0 for structured, stateful communication between clients and servers.
+- **Session Management:** Maintains conversation state across interactions, enabling context-aware responses and actions.
+- **Authentication & Security:** Ensures that only authorized clients and users can access tools and resources, often employing OAuth or similar protocols.
+- **Capability Negotiation:** At connection, the server advertises its available tools, resources, and prompts, allowing clients to dynamically discover and utilize server capabilities.
+
+## Summary Table
+
+| Pillar    | Description                                                                            |
+| --------- | -------------------------------------------------------------------------------------- |
+| Tools     | Executable functions the AI can call (with defined parameters and results)             |
+| Resources | Secure, abstracted access to structured data (files, databases, APIs)                  |
+| Prompts   | Pre-written templates or instructions for standardized, predictable model interactions |
+
+These pillars, supported by robust communication, security, and session management, enable MCP servers to act as powerful, safe, and flexible bridges between AI models and real-world capabilities.
