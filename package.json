@@ -16,7 +16,6 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "clean": "turbo clean",
     "typecheck": "turbo build",
-    "generate-paths": "node scripts/generate-path-mappings.js",
     "test": "vitest",
     "test:integration": "vitest run",
     "test:mcp-integration": "node scripts/dev-mcp.js restart all && vitest tests/integration/llm-tools.test.ts",
