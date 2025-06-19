@@ -32,8 +32,10 @@ export async function POST(req: Request) {
 - Read and write files
 - Make HTTP requests
 - List directory contents
+- Search the web for real-time information using Perplexity AI
+- Search academic sources for scholarly information
 
-When users ask for calculations, file operations, or web requests, use the appropriate tools to help them. After using a tool, explain the results clearly to the user.`,
+When users ask for calculations, file operations, web requests, or need to search for information, use the appropriate tools to help them. After using a tool, explain the results clearly to the user.`,
       tools: {
         add: tool({
           description: "Add two numbers together",
@@ -187,6 +189,114 @@ When users ask for calculations, file operations, or web requests, use the appro
               timestamp: new Date(),
             };
             const result = await mcpClient.callTool(toolCall);
+
+            // Handle errors from MCP client
+            return result.result;
+          },
+        }),
+        search: tool({
+          description:
+            "Search the web using Perplexity AI for real-time, accurate information",
+          parameters: z.object({
+            query: z
+              .string()
+              .describe("The search query to find information about"),
+            model: z
+              .enum(["sonar-pro", "sonar-reasoning", "sonar"])
+              .optional()
+              .describe("Model to use"),
+            search_domain_filter: z
+              .array(z.string())
+              .optional()
+              .describe("List of domains to search within"),
+            search_recency_filter: z
+              .enum(["month", "week", "day", "hour"])
+              .optional()
+              .describe("Filter by recency"),
+            return_images: z
+              .boolean()
+              .optional()
+              .describe("Whether to return relevant images"),
+            return_related_questions: z
+              .boolean()
+              .optional()
+              .describe("Whether to return related questions"),
+            max_tokens: z
+              .number()
+              .optional()
+              .describe("Maximum tokens in response"),
+            temperature: z
+              .number()
+              .min(0)
+              .max(2)
+              .optional()
+              .describe("Temperature for response generation"),
+          }),
+          execute: async ({
+            query,
+            model,
+            search_domain_filter,
+            search_recency_filter,
+            return_images,
+            return_related_questions,
+            max_tokens,
+            temperature,
+          }) => {
+            const toolCall = {
+              id: `call_${Date.now()}`,
+              name: "search",
+              arguments: {
+                query,
+                model,
+                search_domain_filter,
+                search_recency_filter,
+                return_images,
+                return_related_questions,
+                max_tokens,
+                temperature,
+              },
+              status: "pending" as const,
+              timestamp: new Date(),
+            };
+            const result = await mcpClient.callTool(toolCall);
+
+            // Handle errors from MCP client
+            if (result.status === "error") {
+              throw new Error(result.error || "Tool execution failed");
+            }
+
+            return result.result;
+          },
+        }),
+        academic_search: tool({
+          description:
+            "Search academic sources using Perplexity AI for scholarly information",
+          parameters: z.object({
+            query: z.string().describe("The academic search query"),
+            max_tokens: z
+              .number()
+              .optional()
+              .describe("Maximum tokens in response"),
+            return_related_questions: z
+              .boolean()
+              .optional()
+              .describe("Whether to return related academic questions"),
+          }),
+          execute: async ({ query, max_tokens, return_related_questions }) => {
+            const toolCall = {
+              id: `call_${Date.now()}`,
+              name: "academic_search",
+              arguments: { query, max_tokens, return_related_questions },
+              status: "pending" as const,
+              timestamp: new Date(),
+            };
+            const result = await mcpClient.callTool(toolCall);
+
+            // Handle errors from MCP client
+            if (result.status === "error") {
+              throw new Error(result.error || "Tool execution failed");
+            }
+
             return result.result;
           },
         }),

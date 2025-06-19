@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll } from "vitest";
-
 /**
  * Integration Tests for Real LLM + MCP Tools Flow
  *
@@ -245,6 +244,119 @@ describe("LLM Tools Integration", () => {
       // Should contain tool call for "post_request"
       expect(result).toContain("post_request");
       expect(result.toLowerCase()).toMatch(/(post|request|data|test)/);
+      expect(result).toContain("toolCallId");
+    }, 30000);
+  });
+
+  describe("Perplexity Search Tools via LLM", () => {
+    it("should perform web search through LLM tool calling", async () => {
+      const response = await fetch(CHAT_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "user",
+              content:
+                "Search for the latest developments in artificial intelligence",
+            },
+          ],
+        }),
+      });
+
+      expect(response.ok).toBe(true);
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let result = "";
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          result += decoder.decode(value);
+        }
+      }
+
+      // Should contain tool call for "search"
+      expect(result).toContain("search");
+      expect(result.toLowerCase()).toMatch(
+        /(artificial intelligence|ai|development|search)/,
+      );
+      expect(result).toContain("toolCallId");
+    }, 30000);
+
+    it("should perform academic search through LLM tool calling", async () => {
+      const response = await fetch(CHAT_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "user",
+              content:
+                "Search for academic papers about machine learning in healthcare",
+            },
+          ],
+        }),
+      });
+
+      expect(response.ok).toBe(true);
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let result = "";
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          result += decoder.decode(value);
+        }
+      }
+
+      // Should contain tool call for "academic_search"
+      expect(result).toContain("academic_search");
+      expect(result.toLowerCase()).toMatch(
+        /(machine learning|healthcare|academic|research)/,
+      );
+      expect(result).toContain("toolCallId");
+    }, 30000);
+
+    it("should handle search with specific filters", async () => {
+      const response = await fetch(CHAT_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "user",
+              content:
+                "Search for React best practices from the last week on GitHub and Stack Overflow",
+            },
+          ],
+        }),
+      });
+
+      expect(response.ok).toBe(true);
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let result = "";
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          result += decoder.decode(value);
+        }
+      }
+
+      // Should contain tool call for "search" with filtering
+      expect(result).toContain("search");
+      expect(result.toLowerCase()).toMatch(
+        /(react|best practices|github|stackoverflow)/,
+      );
       expect(result).toContain("toolCallId");
     }, 30000);
   });
