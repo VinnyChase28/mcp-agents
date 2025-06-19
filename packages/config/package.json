@@ -1,0 +1,10 @@
+{
+  "name": "@mcp-agents/config",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.js",
+  "files": ["*.js", "*.json"],
+  "devDependencies": {
+    "typescript": "^5"
+  }
+} 
