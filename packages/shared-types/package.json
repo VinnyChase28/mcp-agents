@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "license": "MIT",
   "exports": {
-    ".": "./dist/index.js"
+    "./api": "./dist/api.js",
+    "./chat": "./dist/chat.js",
+    "./mcp": "./dist/mcp.js",
+    "./tools": "./dist/tools.js",
+    "./user": "./dist/user.js"
   },
   "scripts": {
     "build": "tsc",

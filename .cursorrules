@@ -1,0 +1,11 @@
+# Cursor Rules for TypeScript Monorepo
+
+- Functional Over Classes: Prefer pure functions and avoid classes unless required.
+- Named Exports Always: Use named exports for all components, functions, and utilities.
+- Workspace Dependencies: Use workspace:* for internal package dependencies.
+- Guard Clauses First: Handle errors and edge cases at the top of functions.
+- Consistent Naming: Use descriptive variable names and lowercase-dash directories.
+- Zod for Validation: Use Zod schemas at all API/data boundaries.
+- Single Config Source: Extend from root tsconfig.base.json and share linting configs.
+- Pure Package Boundaries: Keep packages independent and focused.
+- Concise & Technical: Write clean, minimal code with clear intent.

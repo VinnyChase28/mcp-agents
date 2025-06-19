@@ -1,6 +1,6 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import { streamText } from "ai";
-import { withMCPTools } from "@mcp-agents/utils";
+import { withMCPTools } from "@mcp-agents/utils/mcp-client";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
