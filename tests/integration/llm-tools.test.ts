@@ -6,11 +6,57 @@ import { describe, it, expect, beforeAll } from "vitest";
  * - Real Anthropic API key
  * - Real AI SDK tool calling via Next.js API routes
  * - MCP client tool execution
- * - Streaming responses with tool calls
+ * - Non-streaming responses for efficient testing
  */
 
 const API_BASE = "http://localhost:3000";
 const CHAT_ENDPOINT = `${API_BASE}/api/chat`;
+
+interface ToolInvocation {
+  toolName: string;
+}
+
+interface ToolResult {
+  toolName: string;
+  result: {
+    content: Array<{
+      text: string;
+    }>;
+  };
+}
+
+interface ChatResponse {
+  toolInvocations: ToolInvocation[];
+  toolResults: ToolResult[];
+}
+
+// Helper function for test API calls
+async function testChatRequest(messages: Array<{ role: string; content: string }>) {
+  return fetch(CHAT_ENDPOINT, {
+    method: "POST",
+    headers: { 
+      "Content-Type": "application/json",
+      "x-test-mode": "true"
+    },
+    body: JSON.stringify({ messages }),
+  });
+}
+
+// Helper function to extract and validate tool results
+function expectToolResult(result: ChatResponse, toolName: string, expectedContent?: string) {
+  expect(result.toolInvocations.length).toBeGreaterThan(0);
+  expect(result.toolInvocations.some((tool) => tool.toolName === toolName)).toBe(true);
+  expect(result.toolResults.length).toBeGreaterThan(0);
+  
+  const toolResult = result.toolResults.find((tr) => tr.toolName === toolName);
+  expect(toolResult).toBeDefined();
+  
+  if (expectedContent) {
+    expect(toolResult!.result.content[0].text).toContain(expectedContent);
+  }
+  
+  return toolResult;
+}
 
 describe("LLM Tools Integration", () => {
   beforeAll(() => {
@@ -24,91 +70,45 @@ describe("LLM Tools Integration", () => {
 
   describe("Calculator Tools via LLM", () => {
     it("should perform addition through LLM tool calling", async () => {
-      const response = await fetch(CHAT_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: "What is 15 + 27?" }],
-        }),
-      });
+      const response = await testChatRequest([
+        { role: "user", content: "What is 15 + 27?" }
+      ]);
 
       expect(response.ok).toBe(true);
 
-      // Read the streaming response
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let result = "";
+      // Parse JSON response (no longer streaming in test mode)
+      const result = await response.json();
 
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          result += decoder.decode(value);
-        }
-      }
-
-      // Should contain tool call for "add" and result 42
-      expect(result).toContain("add");
-      expect(result).toContain("42"); // 15 + 27 = 42
-      expect(result).toContain("toolCallId");
+      // Verify tool was called and returned correct result
+      expectToolResult(result, "add", "42"); // 15 + 27 = 42
     }, 30000);
 
     it("should perform multiplication through LLM tool calling", async () => {
-      const response = await fetch(CHAT_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: "Calculate 8 times 12" }],
-        }),
-      });
+      const response = await testChatRequest([
+        { role: "user", content: "Calculate 8 times 12" }
+      ]);
 
       expect(response.ok).toBe(true);
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let result = "";
+      // Parse JSON response (no longer streaming in test mode)
+      const result = await response.json();
 
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          result += decoder.decode(value);
-        }
-      }
-
-      // Should contain tool call for "multiply" and result 96
-      expect(result).toContain("multiply");
-      expect(result).toContain("96"); // 8 * 12 = 96
-      expect(result).toContain("toolCallId");
+      // Verify tool was called and returned correct result
+      expectToolResult(result, "multiply", "96"); // 8 * 12 = 96
     }, 30000);
 
     it("should handle division including edge cases", async () => {
-      const response = await fetch(CHAT_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: "What is 100 divided by 4?" }],
-        }),
-      });
+      const response = await testChatRequest([
+        { role: "user", content: "What is 100 divided by 4?" }
+      ]);
 
       expect(response.ok).toBe(true);
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let result = "";
+      // Parse JSON response (no longer streaming in test mode)
+      const result = await response.json();
 
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          result += decoder.decode(value);
-        }
-      }
-
-      // Should contain tool call for "divide" and result 25
-      expect(result).toContain("divide");
-      expect(result).toContain("25"); // 100 / 4 = 25
-      expect(result).toContain("toolCallId");
+      // Verify tool was called and returned correct result
+      expectToolResult(result, "divide", "25"); // 100 / 4 = 25
     }, 30000);
   });
 

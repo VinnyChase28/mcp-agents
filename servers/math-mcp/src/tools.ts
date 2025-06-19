@@ -150,10 +150,16 @@ Help me understand which method might be best for different scenarios.`,
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
+    console.log(`[math-mcp] Received tool call for '${name}' with args:`, args);
+
     const schema = (Schemas as Record<string, z.ZodSchema>)[name];
-    if (!schema) throw new Error(`Unknown tool: ${name}`);
+    if (!schema) {
+      console.error(`[math-mcp] Unknown tool: ${name}`);
+      throw new Error(`Unknown tool: ${name}`);
+    }
 
     const parsedArgs = schema.parse(args);
+    console.log(`[math-mcp] Parsed arguments:`, parsedArgs);
     let text = "";
 
     switch (name) {
@@ -213,10 +219,56 @@ Help me understand which method might be best for different scenarios.`,
           text = `Constant ${constantName}: ${value}`;
         }
         break;
+      case "round":
+        {
+          const { number, decimals } = parsedArgs as { number: number, decimals?: number };
+          const result = decimals ? parseFloat(number.toFixed(decimals)) : Math.round(number);
+          text = `Rounded value of ${number} is ${result}`;
+        }
+        break;
+      case "floor":
+        {
+          const { number } = parsedArgs as { number: number };
+          text = `Floor value of ${number} is ${Math.floor(number)}`;
+        }
+        break;
+      case "ceil":
+        {
+          const { number } = parsedArgs as { number: number };
+          text = `Ceiling value of ${number} is ${Math.ceil(number)}`;
+        }
+        break;
+      case "lcm":
+        {
+          const { numbers } = parsedArgs as { numbers: number[] };
+          const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
+          const lcm = (a: number, b: number): number => (a * b) / gcd(a, b);
+          const result = numbers.reduce(lcm);
+          text = `LCM of [${numbers.join(", ")}] is ${result}`;
+        }
+        break;
+      case "solve_quadratic":
+        {
+          const { a, b, c } = parsedArgs as { a: number, b: number, c: number };
+          const discriminant = b * b - 4 * a * c;
+          if (discriminant > 0) {
+            const root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+            const root2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+            text = `The roots are ${root1} and ${root2}`;
+          } else if (discriminant === 0) {
+            const root = -b / (2 * a);
+            text = `The root is ${root}`;
+          } else {
+            text = "No real roots";
+          }
+        }
+        break;
       default:
+        console.error(`[math-mcp] Tool implementation for '${name}' not found.`);
         throw new Error(`Tool implementation for '${name}' not found.`);
     }
 
+    console.log(`[math-mcp] Result for '${name}':`, text);
     return { content: [{ type: "text", text }] };
   });
 } 
