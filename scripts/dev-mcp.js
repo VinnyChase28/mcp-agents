@@ -10,7 +10,6 @@ const __dirname = path.dirname(__filename);
 
 const MCP_SERVERS = {
   math: 'servers/math-mcp',
-  'api-client': 'servers/api-client-mcp',
   perplexity: 'servers/perplexity-mcp',
 };
 
@@ -129,7 +128,6 @@ function showHelp() {
   log('Examples:', 'yellow');
   log('  node scripts/dev-mcp.js restart math', 'cyan');
   log('  node scripts/dev-mcp.js restart all', 'cyan');
-  log('  node scripts/dev-mcp.js build file-manager', 'cyan');
   log('');
   log('Or use the npm scripts:', 'yellow');
   log('  pnpm mcp:math', 'cyan');

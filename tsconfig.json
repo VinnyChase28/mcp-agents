@@ -14,9 +14,6 @@
       "path": "packages/utils"
     },
     {
-      "path": "./servers/api-client-mcp"
-    },
-    {
       "path": "./servers/math-mcp"
     },
     {

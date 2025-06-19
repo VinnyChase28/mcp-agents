@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -24,66 +20,21 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/mcp-agents/config": [
-        "../../packages/config/dist/index"
-      ],
-      "@/mcp-agents/config/*": [
-        "../../packages/config/src/*"
-      ],
-      "@/mcp-agents/shared-types": [
-        "../../packages/shared-types/dist/index"
-      ],
-      "@/mcp-agents/shared-types/*": [
-        "../../packages/shared-types/src/*"
-      ],
-      "@/mcp-agents/utils": [
-        "../../packages/utils/dist/index"
-      ],
-      "@/mcp-agents/utils/*": [
-        "../../packages/utils/src/*"
-      ],
-      "@/mcp-agents/api": [
-        "../../apps/api/src/index"
-      ],
-      "@/mcp-agents/api/*": [
-        "../../apps/api/src/*"
-      ],
-      "@/mcp-agents/web": [
-        "../../apps/web/src/index"
-      ],
-      "@/mcp-agents/web/*": [
-        "../../apps/web/src/*"
-      ],
-      "@/mcp-agents/api-client-mcp": [
-        "../../servers/api-client-mcp/src/index"
-      ],
-      "@/mcp-agents/api-client-mcp/*": [
-        "../../servers/api-client-mcp/src/*"
-      ],
-      "@/mcp-agents/calculator-mcp": [
-        "../../servers/calculator-mcp/src/index"
-      ],
-      "@/mcp-agents/calculator-mcp/*": [
-        "../../servers/calculator-mcp/src/*"
-      ],
-      "@/mcp-agents/file-manager-mcp": [
-        "../../servers/file-manager-mcp/src/index"
-      ],
-      "@/mcp-agents/file-manager-mcp/*": [
-        "../../servers/file-manager-mcp/src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@/mcp-agents/config": ["../../packages/config/dist/index"],
+      "@/mcp-agents/config/*": ["../../packages/config/src/*"],
+      "@/mcp-agents/shared-types": ["../../packages/shared-types/dist/index"],
+      "@/mcp-agents/shared-types/*": ["../../packages/shared-types/src/*"],
+      "@/mcp-agents/utils": ["../../packages/utils/dist/index"],
+      "@/mcp-agents/utils/*": ["../../packages/utils/src/*"],
+      "@/mcp-agents/api": ["../../apps/api/src/index"],
+      "@/mcp-agents/api/*": ["../../apps/api/src/*"],
+      "@/mcp-agents/web": ["../../apps/web/src/index"],
+      "@/mcp-agents/web/*": ["../../apps/web/src/*"],
+      "@/mcp-agents/calculator-mcp": ["../../servers/calculator-mcp/src/index"],
+      "@/mcp-agents/calculator-mcp/*": ["../../servers/calculator-mcp/src/*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

@@ -2,6 +2,7 @@ import { google } from "@ai-sdk/google";
 import { experimental_createMCPClient, streamText, type ToolSet } from "ai";
 import { Experimental_StdioMCPTransport } from "ai/mcp-stdio";
 import path from 'path';
+import { createLogger } from '@mcp-agents/utils';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -9,14 +10,15 @@ export const maxDuration = 30;
 // Define MCP server configurations
 const mcpServerConfigs = [
   { name: 'math', command: 'node', args: [path.resolve(process.cwd(), '../../servers/math-mcp/dist/index.js')] },
-  { name: 'api-client', command: 'node', args: [path.resolve(process.cwd(), '../../servers/api-client-mcp/dist/index.js')] },
-  {
+  { 
     name: 'perplexity',
     command: 'node',
     args: [path.resolve(process.cwd(), '../../servers/perplexity-mcp/dist/index.js')],
     env: { PERPLEXITY_API_KEY: process.env.PERPLEXITY_API_KEY ?? '' },
   },
 ];
+
+const logger = createLogger('chat-api');
 
 type MCPClient = Awaited<ReturnType<typeof experimental_createMCPClient>>;
 
@@ -49,7 +51,7 @@ export async function POST(req: Request) {
     const toolSets = await Promise.all(toolPromises);
     toolSets.forEach(toolSet => Object.assign(allTools, toolSet));
     
-    console.log(`[CHAT] Starting request with ${Object.keys(allTools).length} tools available.`);
+    logger.info(`Starting request with ${Object.keys(allTools).length} tools available.`);
 
     // 3. Stream text with AI model and tools
     const result = await streamText({
@@ -58,11 +60,11 @@ export async function POST(req: Request) {
       tools: allTools,
       system: `You have access to a variety of tools. Use them when necessary to fulfill the user's request. Available tool categories are: math, file management, API requests, and web search.`,
       onFinish: async () => {
-        console.log('[CHAT] Stream finished, closing clients.');
+        logger.info('Stream finished, closing clients.');
         await Promise.all(clients.map(c => c.close()));
       },
       onError: async (e) => {
-        console.error('[CHAT] Stream error:', e);
+        logger.error('Stream error:', e);
         await Promise.all(clients.map(c => c.close()));
       }
     });
@@ -70,7 +72,7 @@ export async function POST(req: Request) {
     return result.toDataStreamResponse();
 
   } catch (error) {
-    console.error("Chat API error:", error);
+    logger.error("Chat API error:", error);
     // Ensure clients are closed even if setup fails
     await Promise.all(clients.map(c => c.close()));
     return new Response(JSON.stringify({ error: "An error occurred while processing your request." }), { status: 500 });

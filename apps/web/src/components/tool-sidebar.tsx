@@ -29,39 +29,23 @@ interface ToolSidebarProps {
   toolUsages: ToolUsage[];
 }
 
-const toolIcons = {
-  add: Calculator,
-  multiply: Calculator,
-  divide: Calculator,
-  read_file: FileText,
-  write_file: FileText,
-  list_directory: Folder,
-  get_request: Globe,
-  post_request: Globe,
-  search: Globe,
-  academic_search: Globe,
+const toolMetadata = {
+  "evaluate": { icon: Calculator, category: "Math" },
+  "list_files": { icon: Folder, category: "File Manager" },
+  "read_file": { icon: FileText, category: "File Manager" },
+  "write_file": { icon: FileText, category: "File Manager" },
+  "search_internet": { icon: Globe, category: "Perplexity" },
 } as const;
 
-const toolCategories = {
-  calculator: ["add", "multiply", "divide"],
-  "file-manager": ["read_file", "write_file", "list_directory"],
-  "api-client": ["get_request", "post_request"],
-  perplexity: ["search", "academic_search"],
-} as const;
 
 function getToolIcon(toolName: string) {
-  const IconComponent = toolIcons[toolName as keyof typeof toolIcons] || Wrench;
-  return IconComponent;
+  return toolMetadata[toolName as keyof typeof toolMetadata]?.icon || Wrench;
 }
 
 function getToolCategory(toolName: string): string {
-  for (const [category, tools] of Object.entries(toolCategories)) {
-    if ((tools as readonly string[]).includes(toolName)) {
-      return category;
-    }
-  }
-  return "unknown";
+  return toolMetadata[toolName as keyof typeof toolMetadata]?.category || "Unknown";
 }
+
 
 function getStatusIcon(status: ToolUsage["status"]) {
   switch (status) {
