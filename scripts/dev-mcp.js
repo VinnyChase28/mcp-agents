@@ -10,7 +10,6 @@ const __dirname = path.dirname(__filename);
 
 const MCP_SERVERS = {
   math: 'servers/math-mcp',
-  'file-manager': 'servers/file-manager-mcp',
   'api-client': 'servers/api-client-mcp',
   perplexity: 'servers/perplexity-mcp',
 };

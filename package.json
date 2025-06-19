@@ -28,17 +28,18 @@
     "mcp:perplexity": "node scripts/dev-mcp.js restart perplexity"
   },
   "devDependencies": {
-    "@types/node": "^20.19.1",
+    "@types/node": "^24.0.3",
     "@vitest/ui": "^3.2.4",
+    "ai": "^4.3.16",
     "dotenv": "^16.5.0",
-    "eslint": "^9.9.1",
+    "eslint": "^9.29.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
-    "pnpm": "^9.1.1",
+    "pnpm": "^10.12.1",
     "prettier": "^3.5.3",
     "start-server-and-test": "^2.0.12",
-    "turbo": "^2.3.3",
-    "typescript": "^5",
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   },
   "lint-staged": {

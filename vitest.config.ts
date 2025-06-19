@@ -23,7 +23,6 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
       "@/packages": resolve(__dirname, "./packages"),
       "@/apps": resolve(__dirname, "./apps"),
-      "@/servers": resolve(__dirname, "./servers"),
       "@/mcp-agents/shared-types": resolve(
         __dirname,
         "./packages/shared-types/src",

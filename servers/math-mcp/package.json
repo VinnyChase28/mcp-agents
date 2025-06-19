@@ -14,12 +14,13 @@
     "inspector": "npx @modelcontextprotocol/inspector dist/index.js"
   },
   "dependencies": {
+    "@mcp-agents/utils": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.13.0",
-    "math-expression-evaluator": "^2.0.2",
-    "zod": "^3.22.4",
+    "math-expression-evaluator": "^2.0.7",
+    "zod": "^3.25.67",
     "zod-to-json-schema": "^3.24.5"
   },
   "devDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.8.3"
   }
 }

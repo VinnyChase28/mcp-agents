@@ -6,6 +6,10 @@ import {
 import type { CallToolRequest } from "@modelcontextprotocol/sdk/types.js";
 import { AcademicSearchSchema, SearchSchema } from "./schemas.js";
 import { callPerplexityAPI } from "./services.js";
+import { createLogger } from "@mcp-agents/utils";
+import { z } from "zod";
+
+const logger = createLogger('perplexity-mcp');
 
 export function registerPerplexityHandlers(server: Server, apiKey: string) {
   // List tools handler
@@ -92,22 +96,42 @@ export function registerPerplexityHandlers(server: Server, apiKey: string) {
     CallToolRequestSchema,
     async (request: CallToolRequest) => {
       const { name, arguments: args } = request.params;
+      logger.info(`Received tool call for '${name}'`, { args });
 
-      switch (name) {
-        case "search": {
-          const {
-            query,
-            model = "sonar-pro",
-            search_domain_filter,
-            search_recency_filter,
-            return_images = false,
-            return_related_questions = false,
-            max_tokens = 1000,
-            temperature = 0.2,
-          } = SearchSchema.parse(args);
+      let parsedArgs;
+      try {
+        switch (name) {
+          case "search":
+            parsedArgs = SearchSchema.parse(args);
+            break;
+          case "academic_search":
+            parsedArgs = AcademicSearchSchema.parse(args);
+            break;
+          default:
+            logger.error(`Unknown tool: ${name}`);
+            throw new Error(`Unknown tool: ${name}`);
+        }
+        logger.info('Parsed arguments successfully', { parsedArgs });
+      } catch (error) {
+        logger.error('Argument parsing failed', { error, tool: name });
+        throw new Error(`Invalid arguments for tool: ${name}`);
+      }
 
-          try {
-            const result = await callPerplexityAPI(apiKey, query, {
+      try {
+        switch (name) {
+          case "search": {
+            const {
+              query,
+              model = "sonar-pro",
+              search_domain_filter,
+              search_recency_filter,
+              return_images = false,
+              return_related_questions = false,
+              max_tokens = 1000,
+              temperature = 0.2,
+            } = parsedArgs as z.infer<typeof SearchSchema>;
+            
+            const apiParams = {
               model,
               temperature,
               max_tokens,
@@ -115,7 +139,9 @@ export function registerPerplexityHandlers(server: Server, apiKey: string) {
               search_recency_filter,
               return_images,
               return_related_questions,
-            });
+            };
+            logger.info('Calling Perplexity API for web search', { query, params: apiParams });
+            const result = await callPerplexityAPI(apiKey, query, apiParams);
 
             const response = {
               query,
@@ -131,37 +157,29 @@ export function registerPerplexityHandlers(server: Server, apiKey: string) {
                 search_type: "web",
               },
             };
-
+            logger.info('Perplexity web search successful');
             return {
-              content: [
-                {
-                  type: "text",
-                  text: JSON.stringify(response, null, 2),
-                },
-              ],
+              content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
             };
-          } catch (error) {
-            throw new Error(`Search failed: ${error}`);
           }
-        }
 
-        case "academic_search": {
-          const {
-            query,
-            max_tokens = 1500,
-            return_related_questions = true,
-          } = AcademicSearchSchema.parse(args);
-
-          try {
+          case "academic_search": {
+            const {
+              query,
+              max_tokens = 1500,
+              return_related_questions = true,
+            } = parsedArgs as z.infer<typeof AcademicSearchSchema>;
+            
             const academicQuery = `Please provide a comprehensive academic overview of: ${query}. Include peer-reviewed sources, key research findings, and scholarly perspectives.`;
-
-            const result = await callPerplexityAPI(apiKey, academicQuery, {
+            const apiParams = {
               model: "sonar-pro",
               temperature: 0.1,
               max_tokens,
               return_related_questions,
-            });
-
+            };
+            logger.info('Calling Perplexity API for academic search', { original_query: query, academic_query: academicQuery, params: apiParams });
+            const result = await callPerplexityAPI(apiKey, academicQuery, apiParams);
+            
             const response = {
               query,
               academic_query: academicQuery,
@@ -174,23 +192,23 @@ export function registerPerplexityHandlers(server: Server, apiKey: string) {
                 return_related_questions,
               },
             };
-
+            logger.info('Perplexity academic search successful');
             return {
-              content: [
-                {
-                  type: "text",
-                  text: JSON.stringify(response, null, 2),
-                },
-              ],
+              content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
             };
-          } catch (error) {
-            throw new Error(`Academic search failed: ${error}`);
           }
         }
-
-        default:
-          throw new Error(`Unknown tool: ${name}`);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack : undefined;
+        logger.error(`Error during tool execution for '${name}'`, {
+          error: errorMessage,
+          stack: errorStack,
+        });
+        throw new Error(`Execution failed for tool ${name}: ${errorMessage}`);
       }
+      
+      throw new Error(`Unknown tool: ${name}`);
     },
   );
 } 

@@ -41,8 +41,21 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# TypeScript build artifacts (should only be in dist/, but sometimes generated in src/)
+packages/*/src/**/*.js
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.d.ts.map
+packages/*/src/**/*.js.map
+servers/*/src/**/*.js
+servers/*/src/**/*.d.ts
+servers/*/src/**/*.d.ts.map
+servers/*/src/**/*.js.map
+
 # Turborepo
 .turbo/
 
 # Package manager
 pnpm-lock.yaml
+
+# Logs
+logs/
