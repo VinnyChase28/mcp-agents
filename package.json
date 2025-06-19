@@ -11,7 +11,13 @@
     "clean": "turbo run clean",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "mcp:build": "turbo run build --filter='./servers/*'",
-    "mcp:dev": "turbo run dev --filter='./servers/*'"
+    "mcp:dev": "turbo run dev --filter='./servers/*'",
+    "dev:all": "./dev.sh",
+    "dev:web": "./dev-web.sh",
+    "dev:api": "turbo run dev --filter @mcp-agents/api",
+    "dev:frontend": "turbo run dev --filter @mcp-agents/web",
+    "build:packages": "turbo run build --filter='./packages/*'",
+    "start:web": "pnpm dev:web"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",

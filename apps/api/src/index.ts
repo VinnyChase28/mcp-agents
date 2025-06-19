@@ -4,7 +4,7 @@ import type { ApiResponse, Message, ChatSession } from '@mcp-agents/shared-types
 import { createApiResponse, createMessage } from '@mcp-agents/utils';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.API_PORT || process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
