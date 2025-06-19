@@ -1,4 +1,4 @@
-import { ToolCall } from './tools.js';
+import type { ToolCall } from './tools.js';
 
 export interface Message {
   id: string;

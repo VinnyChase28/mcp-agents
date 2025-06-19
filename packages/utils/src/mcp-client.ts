@@ -1,5 +1,6 @@
 import { experimental_createMCPClient } from "ai";
 import { Experimental_StdioMCPTransport } from "ai/mcp-stdio";
+import type { ToolSet } from "ai";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -61,7 +62,7 @@ export class MCPClientManager {
         ),
       ],
       env: {
-        PERPLEXITY_API_KEY: process.env.PERPLEXITY_API_KEY || "",
+        PERPLEXITY_API_KEY: process.env["PERPLEXITY_API_KEY"] || "",
       },
     },
   ];
@@ -150,13 +151,13 @@ export function getMCPClientManager(): MCPClientManager {
 
 // Helper function for resource management
 export async function withMCPTools<T>(
-  operation: (tools: Record<string, unknown>) => Promise<T>,
+  operation: (tools: ToolSet) => Promise<T>,
 ): Promise<T> {
   const manager = getMCPClientManager();
 
   try {
     const tools = await manager.getAllTools();
-    return await operation(tools);
+    return await operation(tools as ToolSet);
   } finally {
     // Keep connections alive for performance, but provide cleanup method
     // Call manager.closeAll() when shutting down the application
