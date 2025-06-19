@@ -113,45 +113,33 @@ These pillars, supported by robust communication, security, and session manageme
 
 ## End-to-End Invocation Flow
 
-To understand how the components work together, here is a step-by-step explanation of the invocation process, from user input to the final AI-generated response.
+Here is a step-by-step breakdown of the data flow from the user to the MCP servers and back:
 
-<br/>
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Frontend
-    participant ChatAPI
-    participant MCPHelper
-    participant LLM
-    participant MCPServer
-
-    User->>Frontend: Sends a message (e.g., "What is 2+2?")
-    Frontend->>ChatAPI: POST request with message history
-    ChatAPI->>MCPHelper: Initializes all MCP clients and aggregates tools
-    MCPHelper->>LLM: Calls streamText() with prompt and all available tools
-    LLM-->>MCPHelper: Responds with a tool call (e.g., use "evaluate" with expression "2+2")
-    MCPHelper->>MCPServer: Sends "tools/call" request via stdio transport
-    MCPServer-->>MCPServer: Executes the evaluate("2+2") function
-    MCPServer-->>MCPHelper: Returns the result (e.g., "4") via stdio
-    MCPHelper->>LLM: Sends tool result back to the model for interpretation
-    LLM-->>MCPHelper: Generates a final, user-friendly text response
-    MCPHelper-->>ChatAPI: Streams the final response back
-    ChatAPI-->>Frontend: Streams the response to the client
-    Frontend-->>User: Renders the final answer ("The result is 4.")
-```
-
-<br/>
-
-### Detailed Breakdown
-
-1.  **User Input**: The process begins when the user sends a message through the chat interface.
-2.  **Frontend to API**: The Next.js frontend makes a `POST` request to the `/api/chat` route, sending the current conversation history.
-3.  **MCP Client Initialization**: The `withMCPTools` helper function is called. It establishes a connection to each MCP server (`math`, `file-manager`, etc.) using a stdio transport and collects all the available tools.
-4.  **First LLM Call (Tool Selection)**: The Vercel AI SDK's `streamText` function sends the user's prompt and the aggregated list of tools to the AI model. The model analyzes the prompt and, if necessary, decides to use one of the tools, returning a structured "tool call" request.
-5.  **Tool Execution via MCP**: The AI SDK identifies which MCP server is responsible for the requested tool and sends it a `tools/call` JSON-RPC request over stdio.
-6.  **MCP Server Processing**: The target MCP server receives the request, executes the corresponding tool's logic, and sends the result back via its standard output.
-7.  **Response to LLM**: The AI SDK receives the tool's result and sends it back to the LLM in a second API call. This allows the model to interpret the tool's output.
-8.  **Final Response to User**: The LLM generates a natural, user-friendly response based on the tool result, which is then streamed back to the frontend and displayed in the UI.
+1.  **User**: Interacts with the chat interface, sending a message like `"What is 2+2?"`.
+2.  **Frontend (Next.js App)**: Captures the message and makes a `POST` request to the `/api/chat` endpoint with the conversation history.
+3.  **Chat API (`/api/chat`)**:
+    - Calls the `withMCPTools` helper function.
+    - The helper initializes clients for all MCP servers (Math, File Manager, etc.) and aggregates their `tools`.
+4.  **`withMCPTools` Helper**:
+    - Invokes the AI SDK's `streamText` function.
+    - This sends the user's prompt, message history, and the combined list of available tools to the LLM.
+5.  **LLM (Anthropic Claude)**:
+    - Analyzes the request and decides to use a tool.
+    - Responds with a structured "tool call" object, e.g., `{ toolName: 'evaluate', args: { expression: '2+2' } }`.
+6.  **`withMCPTools` Helper**:
+    - Receives the tool call from the LLM.
+    - Identifies the correct MCP server responsible for the `evaluate` tool (the Math server).
+    - Sends a `tools/call` JSON-RPC request to the Math server over its stdio transport.
+7.  **MCP Server (Math)**:
+    - Receives the request and executes the `evaluate("2+2")` function.
+    - Returns the result (`"4"`) back to the helper via stdio.
+8.  **`withMCPTools` Helper**:
+    - Receives the tool result.
+    - Sends the result back to the LLM for interpretation.
+9.  **LLM (Anthropic Claude)**:
+    - Formulates a natural language response based on the tool's output (e.g., "The result is 4.").
+10. **API & Frontend**:
+    - The final response is streamed from the `Chat API` back to the `Frontend`.
+    - The `User` sees the final answer rendered in the chat window.
 
 These pillars, supported by robust communication, security, and session management, enable MCP servers to act as powerful, safe, and flexible bridges between AI models and real-world capabilities.
