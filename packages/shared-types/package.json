@@ -12,7 +12,10 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@mcp-agents/config": "workspace:*"
+    "@mcp-agents/config": "workspace:*",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "zod": "^3.25.67"
   }
-} 
+}
