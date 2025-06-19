@@ -10,9 +10,9 @@ export async function POST(req: Request) {
     const { messages } = await req.json();
 
     // Check if API key is configured
-    if (!process.env.GOOGLE_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       return Response.json(
-        { error: "Google API key not configured" },
+        { error: "GEMINI_API_KEY not configured" },
         { status: 500 },
       );
     }
