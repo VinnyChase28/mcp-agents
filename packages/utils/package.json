@@ -5,6 +5,9 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -20,5 +23,6 @@
     "@types/node": "^22.0.0",
     "typescript": "^5.5.4",
     "@mcp-agents/config": "workspace:*"
-  }
+  },
+  "license": "MIT"
 }

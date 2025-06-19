@@ -4,8 +4,15 @@
   "private": true,
   "type": "module",
   "main": "./index.js",
-  "files": ["*.js", "*.json"],
+  "types": "index.d.ts",
+  "files": [
+    "*.js",
+    "*.json"
+  ],
   "devDependencies": {
     "typescript": "^5"
+  },
+  "exports": {
+    "./tsconfig": "./tsconfig.json"
   }
-} 
+}

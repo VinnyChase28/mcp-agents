@@ -1,6 +1,49 @@
-# MCP Agents - Complete TypeScript Monorepo
+# MCP Agents
 
-A comprehensive TypeScript monorepo featuring Model Context Protocol (MCP) servers, Next.js frontend with shadcn/ui, Express API backend, and shared packages.
+A TypeScript monorepo for Model Context Protocol (MCP) agents with Next.js frontend and multiple MCP servers.
+
+## 🚀 Quick Start
+
+This project uses pnpm workspaces and Turborepo for efficient monorepo management.
+
+## Testing our enhanced setup! ✨
+
+Our new configuration includes:
+
+- Automatic code formatting and linting on commit
+- Type-checking before push
+- Consistent package management with version enforcement
+
+## Getting Started
+
+```bash
+# Install dependencies
+pnpm install
+
+# Start development servers
+pnpm dev
+
+# Build all packages
+pnpm build
+
+# Run tests
+pnpm test
+```
+
+## Architecture
+
+- `apps/web` - Next.js chat interface
+- `packages/shared-types` - Shared TypeScript types
+- `packages/utils` - Shared utilities and MCP client
+- `servers/` - Various MCP servers (calculator, file-manager, api-client, perplexity)
+
+## Testing
+
+Run integration tests with:
+
+```bash
+pnpm test
+```
 
 ## 🏗️ Project Structure
 
@@ -24,43 +67,28 @@ mcp-agents/
 └── claude_desktop_config.example.json
 ```
 
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+ 
-- PNPM 9+
-- Git
-
-### Installation
-```bash
-# Clone and install
-git clone <your-repo>
-cd mcp-agents
-pnpm install
-
-# Build everything
-pnpm build
-
-# Start development servers
-pnpm dev
-```
-
 ## 🤖 MCP Servers
 
 ### Calculator Server
+
 Provides mathematical operations:
+
 - `add` - Add two numbers
-- `multiply` - Multiply two numbers  
+- `multiply` - Multiply two numbers
 - `divide` - Divide two numbers
 
 ### File Manager Server
+
 File system operations:
+
 - `read_file` - Read file contents
 - `write_file` - Write content to file
 - `list_directory` - List directory contents
 
 ### API Client Server
+
 HTTP request capabilities:
+
 - `get_request` - Make GET requests
 - `post_request` - Make POST requests
 
@@ -75,7 +103,7 @@ pnpm build
 pnpm inspector
 
 # File manager server
-cd servers/file-manager-mcp  
+cd servers/file-manager-mcp
 pnpm build
 pnpm inspector
 
@@ -94,7 +122,9 @@ pnpm inspector
      "mcpServers": {
        "calculator": {
          "command": "node",
-         "args": ["/Users/your-username/path/to/mcp-agents/servers/calculator-mcp/dist/index.js"]
+         "args": [
+           "/Users/your-username/path/to/mcp-agents/servers/calculator-mcp/dist/index.js"
+         ]
        }
      }
    }
@@ -129,6 +159,7 @@ pnpm format
 ## 🌐 Development Servers
 
 When running `pnpm dev`:
+
 - **Frontend**: http://localhost:3000 (Next.js with shadcn/ui)
 - **API**: http://localhost:3001 (Express backend)
 - **MCP Servers**: Available via stdio for Claude Desktop
@@ -136,12 +167,14 @@ When running `pnpm dev`:
 ## 🏛️ Architecture
 
 ### Monorepo Benefits
+
 - **Shared Types**: Common interfaces across frontend, backend, and MCP servers
 - **Shared Utils**: Reusable functions and validation helpers
 - **Unified Tooling**: Single build system, linting, and type checking
 - **Efficient Caching**: Turborepo optimizes builds and tests
 
 ### MCP Integration
+
 - **Type Safety**: Full TypeScript support for MCP protocol
 - **Modular Design**: Each server is independently deployable
 - **Shared Infrastructure**: Common types and utilities
@@ -160,6 +193,7 @@ When running `pnpm dev`:
 ## 📝 Adding New MCP Servers
 
 1. Create new server directory:
+
    ```bash
    mkdir servers/my-new-server
    cd servers/my-new-server
@@ -168,6 +202,7 @@ When running `pnpm dev`:
 2. Copy package.json from existing server and update name
 
 3. Create `src/index.ts` following the pattern:
+
    ```typescript
    import { Server } from "@modelcontextprotocol/sdk/server/index.js";
    import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
