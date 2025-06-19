@@ -98,13 +98,72 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         name: "search",
         description:
           "Search the web using Perplexity AI for real-time, accurate information",
-        inputSchema: SearchSchema,
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "The search query to find information about",
+            },
+            model: {
+              type: "string",
+              enum: ["sonar-pro", "sonar-reasoning", "sonar"],
+              description: "Model to use",
+            },
+            search_domain_filter: {
+              type: "array",
+              items: { type: "string" },
+              description: "List of domains to search within",
+            },
+            search_recency_filter: {
+              type: "string",
+              enum: ["month", "week", "day", "hour"],
+              description: "Filter by recency",
+            },
+            return_images: {
+              type: "boolean",
+              description: "Whether to return relevant images",
+            },
+            return_related_questions: {
+              type: "boolean",
+              description: "Whether to return related questions",
+            },
+            max_tokens: {
+              type: "number",
+              description: "Maximum tokens in response",
+            },
+            temperature: {
+              type: "number",
+              minimum: 0,
+              maximum: 2,
+              description: "Temperature for response generation",
+            },
+          },
+          required: ["query"],
+        },
       },
       {
         name: "academic_search",
         description:
           "Search academic sources using Perplexity AI for scholarly information",
-        inputSchema: AcademicSearchSchema,
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "The academic search query",
+            },
+            max_tokens: {
+              type: "number",
+              description: "Maximum tokens in response",
+            },
+            return_related_questions: {
+              type: "boolean",
+              description: "Whether to return related academic questions",
+            },
+          },
+          required: ["query"],
+        },
       },
     ],
   };

@@ -249,6 +249,15 @@ describe("LLM Tools Integration", () => {
   });
 
   describe("Perplexity Search Tools via LLM", () => {
+    beforeAll(() => {
+      // Verify Perplexity API key is available
+      if (!process.env.PERPLEXITY_API_KEY) {
+        throw new Error(
+          "PERPLEXITY_API_KEY required for Perplexity integration tests.",
+        );
+      }
+    });
+
     it("should perform web search through LLM tool calling", async () => {
       const response = await fetch(CHAT_ENDPOINT, {
         method: "POST",
@@ -279,9 +288,9 @@ describe("LLM Tools Integration", () => {
       }
 
       // Should contain tool call for "search"
-      expect(result).toContain("search");
+      expect(result).toContain('"toolName":"search"');
       expect(result.toLowerCase()).toMatch(
-        /(artificial intelligence|ai|development|search)/,
+        /artificial intelligence|ai|development/,
       );
       expect(result).toContain("toolCallId");
     }, 30000);
@@ -316,9 +325,9 @@ describe("LLM Tools Integration", () => {
       }
 
       // Should contain tool call for "academic_search"
-      expect(result).toContain("academic_search");
+      expect(result).toContain('"toolName":"academic_search"');
       expect(result.toLowerCase()).toMatch(
-        /(machine learning|healthcare|academic|research)/,
+        /machine learning|healthcare|academic|research/,
       );
       expect(result).toContain("toolCallId");
     }, 30000);
@@ -332,7 +341,7 @@ describe("LLM Tools Integration", () => {
             {
               role: "user",
               content:
-                "Search for React best practices from the last week on GitHub and Stack Overflow",
+                "Search for React best practices from the last week on github.com",
             },
           ],
         }),
@@ -352,11 +361,10 @@ describe("LLM Tools Integration", () => {
         }
       }
 
-      // Should contain tool call for "search" with filtering
-      expect(result).toContain("search");
-      expect(result.toLowerCase()).toMatch(
-        /(react|best practices|github|stackoverflow)/,
-      );
+      // Should contain tool call for "search" with filtering arguments
+      expect(result).toContain('"toolName":"search"');
+      expect(result).toContain("github.com");
+      expect(result).toContain("week");
       expect(result).toContain("toolCallId");
     }, 30000);
   });

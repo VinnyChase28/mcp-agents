@@ -1,12 +1,12 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { experimental_createMCPClient } from "ai";
+import { Experimental_StdioMCPTransport } from "ai/mcp-stdio";
 import path from "path";
 import { fileURLToPath } from "url";
-import type { Tool, ToolResult } from "@mcp-agents/shared-types";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// MCP Server configuration
 interface MCPServerConfig {
   name: string;
   command: string;
@@ -14,14 +14,12 @@ interface MCPServerConfig {
   env?: Record<string, string>;
 }
 
-interface ActiveServer {
-  client: Client;
-  transport: StdioClientTransport;
-  tools: Tool[];
-}
+// Type for the MCP client returned by experimental_createMCPClient
+type MCPClient = Awaited<ReturnType<typeof experimental_createMCPClient>>;
 
-export class MCPClient {
-  private servers = new Map<string, ActiveServer>();
+// MCP Client Manager using AI SDK
+export class MCPClientManager {
+  private clients = new Map<string, MCPClient>();
   private serverConfigs: MCPServerConfig[] = [
     {
       name: "calculator",
@@ -68,22 +66,8 @@ export class MCPClient {
     },
   ];
 
-  async initialize(): Promise<void> {
-    console.log("Initializing MCP servers...");
-
-    for (const config of this.serverConfigs) {
-      try {
-        await this.connectToServer(config);
-        console.log(`✓ Connected to ${config.name} server`);
-      } catch (error) {
-        console.error(`✗ Failed to connect to ${config.name} server:`, error);
-      }
-    }
-  }
-
-  private async connectToServer(config: MCPServerConfig): Promise<void> {
-    // Create transport with proper parameters
-    const transport = new StdioClientTransport({
+  private async createClient(config: MCPServerConfig): Promise<MCPClient> {
+    const transport = new Experimental_StdioMCPTransport({
       command: config.command,
       args: config.args,
       env: {
@@ -96,119 +80,85 @@ export class MCPClient {
       },
     });
 
-    const client = new Client(
-      {
-        name: "mcp-agents-client",
-        version: "0.1.0",
-      },
-      {
-        capabilities: {},
-      },
-    );
-
-    // Connect to the server
-    await client.connect(transport);
-
-    // Get available tools
-    const toolsResponse = await client.listTools();
-    const tools: Tool[] = toolsResponse.tools.map((tool) => ({
-      name: tool.name,
-      description: tool.description || "",
-      parameters: tool.inputSchema as Record<string, unknown>,
-      server: config.name,
-    }));
-
-    // Store the active server
-    this.servers.set(config.name, {
-      client,
+    const client = await experimental_createMCPClient({
       transport,
-      tools,
     });
+
+    return client;
   }
 
-  async getAvailableTools(): Promise<Tool[]> {
-    const allTools: Tool[] = [];
+  async getClient(serverName: string): Promise<MCPClient> {
+    if (!this.clients.has(serverName)) {
+      const config = this.serverConfigs.find((c) => c.name === serverName);
+      if (!config) {
+        throw new Error(`Unknown MCP server: ${serverName}`);
+      }
 
-    for (const server of this.servers.values()) {
-      allTools.push(...server.tools);
+      try {
+        const client = await this.createClient(config);
+        this.clients.set(serverName, client);
+        console.log(`✓ Connected to ${serverName} MCP server`);
+      } catch (error) {
+        console.error(`✗ Failed to connect to ${serverName} server:`, error);
+        throw error;
+      }
+    }
+    return this.clients.get(serverName)!;
+  }
+
+  async getAllTools() {
+    const allTools = {};
+
+    for (const config of this.serverConfigs) {
+      try {
+        const client = await this.getClient(config.name);
+        const tools = await client.tools();
+        Object.assign(allTools, tools);
+      } catch (error) {
+        console.error(`Failed to get tools from ${config.name}:`, error);
+      }
     }
 
     return allTools;
   }
 
-  async callTool(
-    toolName: string,
-    args: Record<string, unknown>,
-  ): Promise<ToolResult> {
-    // Find which server has this tool
-    let targetServer: ActiveServer | undefined;
-
-    for (const server of this.servers.values()) {
-      if (server.tools.some((tool) => tool.name === toolName)) {
-        targetServer = server;
-        break;
-      }
-    }
-
-    if (!targetServer) {
-      throw new Error(`Tool '${toolName}' not found in any connected server`);
-    }
-
-    try {
-      const response = await targetServer.client.callTool({
-        name: toolName,
-        arguments: args,
-      });
-
-      // Extract content from MCP response
-      let content = "";
-      if (response.content && Array.isArray(response.content)) {
-        for (const item of response.content) {
-          if (item.type === "text") {
-            content += item.text;
-          }
-        }
-      }
-
-      return {
-        success: true,
-        result: content,
-        toolName,
-        args,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-        toolName,
-        args,
-      };
-    }
+  async closeAll(): Promise<void> {
+    await Promise.all(
+      Array.from(this.clients.values()).map((client) => client.close()),
+    );
+    this.clients.clear();
   }
 
-  async shutdown(): Promise<void> {
-    console.log("Shutting down MCP servers...");
-
-    for (const [name, server] of this.servers.entries()) {
-      try {
-        await server.client.close();
-        console.log(`✓ Shut down ${name} server`);
-      } catch (error) {
-        console.error(`✗ Error shutting down ${name} server:`, error);
-      }
+  async close(serverName: string): Promise<void> {
+    const client = this.clients.get(serverName);
+    if (client) {
+      await client.close();
+      this.clients.delete(serverName);
     }
-
-    this.servers.clear();
   }
 }
 
 // Singleton instance
-let mcpClientInstance: MCPClient | null = null;
+let mcpClientManager: MCPClientManager | null = null;
 
-export async function getMCPClient(): Promise<MCPClient> {
-  if (!mcpClientInstance) {
-    mcpClientInstance = new MCPClient();
-    await mcpClientInstance.initialize();
+export function getMCPClientManager(): MCPClientManager {
+  if (!mcpClientManager) {
+    mcpClientManager = new MCPClientManager();
   }
-  return mcpClientInstance;
+  return mcpClientManager;
+}
+
+// Helper function for resource management
+export async function withMCPTools<T>(
+  operation: (tools: Record<string, unknown>) => Promise<T>,
+): Promise<T> {
+  const manager = getMCPClientManager();
+
+  try {
+    const tools = await manager.getAllTools();
+    return await operation(tools);
+  } finally {
+    // Keep connections alive for performance, but provide cleanup method
+    // Call manager.closeAll() when shutting down the application
+  }
 }

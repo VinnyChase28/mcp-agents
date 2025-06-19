@@ -54,7 +54,7 @@ export const createApiResponse = <T>(
   message,
 });
 
-// Chat utilities
+// Message utilities
 export const generateMessageId = (): string => {
   return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 };
@@ -109,5 +109,9 @@ export const pick = <T extends Record<string, unknown>, K extends keyof T>(
   return result;
 };
 
-// MCP Client
-export { MCPClient, getMCPClient } from "./mcp-client.js";
+// MCP Client - Updated to use AI SDK
+export {
+  MCPClientManager,
+  getMCPClientManager,
+  withMCPTools,
+} from "./mcp-client.js";
