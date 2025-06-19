@@ -6,44 +6,23 @@ import {
 import mexp from "math-expression-evaluator";
 import { Schemas } from "./schemas.js";
 import { MATH_CONSTANTS } from "./constants.js";
-import { z, ZodObject, ZodRawShape } from "zod";
-
-// A type-safe, but simplified, Zod to JSON Schema converter
-const zodToJsonSchema = (schema: ZodObject<ZodRawShape>) => {
-  const { shape } = schema;
-  const properties: Record<string, { type: string; description: string }> = {};
-  const required: string[] = [];
-
-  for (const key in shape) {
-    if (Object.prototype.hasOwnProperty.call(shape, key)) {
-      const field = shape[key];
-      if (!field.isOptional()) {
-        required.push(key);
-      }
-      const typeName = (field._def as { typeName: string }).typeName;
-      properties[key] = {
-        type:
-          typeName === "ZodNumber"
-            ? "number"
-            : typeName === "ZodString"
-              ? "string"
-              : typeName === "ZodBoolean"
-                ? "boolean"
-                : "object",
-        description: field.description || "",
-      };
-    }
-  }
-  return { type: "object", properties, required };
-};
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 
 export function registerMathHandlers(server: Server) {
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: Object.entries(Schemas).map(([name, schema]) => ({
-      name,
-      description: `Performs the ${name} operation.`,
-      inputSchema: zodToJsonSchema(schema),
-    })),
+    tools: Object.entries(Schemas).map(([name, schema]) => {
+      let description = `Performs the ${name} operation.`;
+      if (name === "evaluate") {
+        description =
+          "Evaluates a mathematical expression string. Use this for complex calculations with multiple operators, parentheses, and functions like sqrt, !, etc.";
+      }
+      return {
+        name,
+        description,
+        inputSchema: zodToJsonSchema(schema),
+      };
+    }),
   }));
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -54,15 +33,24 @@ export function registerMathHandlers(server: Server) {
     const parsedArgs = schema.parse(args);
     let text = "";
 
-    // This switch statement will be expanded to handle all tools.
-    // For now, it shows the pattern for a few key tools.
     switch (name) {
       case "evaluate":
         try {
           const { expression } = parsedArgs as { expression: string };
-          const result = new mexp().eval(expression);
+          const m = new mexp();
+          m.addToken([
+            {
+              type: 0,
+              token: "sqrt",
+              show: "sqrt",
+              value: (a: number) => Math.sqrt(a),
+              precedence: 99,
+            },
+          ]);
+          const result = m.eval(expression);
           text = `${expression} = ${result}`;
         } catch (e) {
+          console.error("Math evaluation error:", (e as Error).message);
           throw new Error(`Evaluation failed: ${(e as Error).message}`);
         }
         break;
@@ -73,10 +61,31 @@ export function registerMathHandlers(server: Server) {
           text = `Sum of [${numbers.join(", ")}] = ${result}`;
         }
         break;
+      case "multiply":
+        {
+          const numbers = (parsedArgs as { numbers: number[] }).numbers;
+          const result = numbers.reduce((s, n) => s * n, 1);
+          text = `Product of [${numbers.join(", ")}] = ${result}`;
+        }
+        break;
+      case "divide":
+        {
+          const { dividend, divisor } = parsedArgs as {
+            dividend: number;
+            divisor: number;
+          };
+          if (divisor === 0) {
+            throw new Error("Division by zero is not allowed.");
+          }
+          const result = dividend / divisor;
+          text = `${dividend} / ${divisor} = ${result}`;
+        }
+        break;
       case "get_constant":
         {
-          const constantName = (parsedArgs as { name: keyof typeof MATH_CONSTANTS })
-            .name;
+          const constantName = (
+            parsedArgs as { name: keyof typeof MATH_CONSTANTS }
+          ).name;
           const value = MATH_CONSTANTS[constantName];
           text = `Constant ${constantName}: ${value}`;
         }

@@ -480,5 +480,39 @@ describe("LLM Tools Integration", () => {
         /(error|zero|undefined|infinity|cannot)/,
       );
     }, 30000);
+
+    it("should handle complex expressions with the evaluate tool", async () => {
+      const response = await fetch(CHAT_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "user",
+              content: "What is the result of (2 * (3 + 4))^2 / (sqrt(9) + 2!) ?",
+            },
+          ],
+        }),
+      });
+
+      expect(response.ok).toBe(true);
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let result = "";
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          result += decoder.decode(value);
+        }
+      }
+
+      // Should contain tool call for "evaluate" and the correct result
+      expect(result).toContain("evaluate");
+      expect(result).toContain("39.2");
+      expect(result).toContain("toolCallId");
+    }, 30000);
   });
 });

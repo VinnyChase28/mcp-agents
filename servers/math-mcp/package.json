@@ -15,8 +15,9 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.6.0",
+    "math-expression-evaluator": "^2.0.2",
     "zod": "^3.22.4",
-    "math-expression-evaluator": "^2.0.2"
+    "zod-to-json-schema": "^3.24.5"
   },
   "devDependencies": {
     "typescript": "^5"

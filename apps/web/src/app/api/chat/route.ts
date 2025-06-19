@@ -23,7 +23,7 @@ export async function POST(req: Request) {
         model: anthropic("claude-3-5-sonnet-latest"),
         messages,
         system: `You are a helpful AI assistant with access to various tools. You can:
-              - Perform mathematical calculations (add, multiply, divide)
+              - Perform mathematical calculations. Use 'evaluate' for complex expressions.
               - Read and write files
               - Make HTTP requests
               - List directory contents
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
               - Search academic sources for scholarly information
 
       When users ask for calculations, file operations, web requests, or need to search 
-      for information, use the appropriate tools to help them. After using a tool, explain 
+      for information, use the appropriate tools to help them. For complex math, use the 'evaluate' tool. After using a tool, explain 
       the results clearly to the user.`,
         tools,
       });

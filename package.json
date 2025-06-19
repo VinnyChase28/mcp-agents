@@ -20,7 +20,13 @@
     "test": "vitest",
     "test:integration": "vitest run",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "mcp": "node scripts/dev-mcp.js",
+    "mcp:restart": "node scripts/dev-mcp.js restart all",
+    "mcp:math": "node scripts/dev-mcp.js restart math",
+    "mcp:file": "node scripts/dev-mcp.js restart file-manager",
+    "mcp:api": "node scripts/dev-mcp.js restart api-client",
+    "mcp:perplexity": "node scripts/dev-mcp.js restart perplexity"
   },
   "devDependencies": {
     "@types/node": "^20.19.1",
