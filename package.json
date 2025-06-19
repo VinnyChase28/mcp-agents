@@ -6,10 +6,17 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
     "clean": "turbo run clean",
-    "type-check": "turbo run type-check"
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "mcp:build": "turbo run build --filter='./servers/*'",
+    "mcp:dev": "turbo run dev --filter='./servers/*'"
   },
   "devDependencies": {
+    "@types/node": "^20.11.24",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
     "turbo": "^2.3.3",
     "typescript": "^5"
   },
