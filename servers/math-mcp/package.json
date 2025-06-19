@@ -1,0 +1,24 @@
+{
+  "name": "@mcp-agents/math-mcp",
+  "version": "1.0.0",
+  "description": "A comprehensive mathematical MCP server with advanced computational capabilities",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "math-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "inspector": "npx @modelcontextprotocol/inspector dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "zod": "^3.22.4",
+    "math-expression-evaluator": "^2.0.2"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

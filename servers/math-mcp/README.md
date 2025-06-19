@@ -5,29 +5,36 @@ A Model Context Protocol (MCP) server that provides mathematical calculation too
 ## 🧮 Available Tools
 
 ### `add`
+
 Add two numbers together.
 
 **Parameters:**
+
 - `a` (number): First number
 - `b` (number): Second number
 
 ### `multiply`
+
 Multiply two numbers.
 
 **Parameters:**
+
 - `a` (number): First number
 - `b` (number): Second number
 
 ### `divide`
+
 Divide two numbers with error handling for division by zero.
 
 **Parameters:**
+
 - `a` (number): Dividend
 - `b` (number): Divisor
 
 ## 💬 Example Claude Desktop Prompts
 
 ### Basic Calculations
+
 ```
 "Can you add 15 and 27 for me?"
 "What's 8 times 9?"
@@ -36,6 +43,7 @@ Divide two numbers with error handling for division by zero.
 ```
 
 ### Word Problems
+
 ```
 "I have 12 apples and buy 8 more. How many do I have total?"
 "If a pizza costs $18 and I want to split it among 3 people, how much does each person pay?"
@@ -43,6 +51,7 @@ Divide two numbers with error handling for division by zero.
 ```
 
 ### Multiple Operations
+
 ```
 "Add 10 and 5, then multiply the result by 3"
 "Calculate (20 + 30) ÷ 2"
@@ -50,6 +59,7 @@ Divide two numbers with error handling for division by zero.
 ```
 
 ### Error Handling
+
 ```
 "What happens if I divide 10 by 0?"
 "Can you divide any number by zero?"
@@ -58,6 +68,7 @@ Divide two numbers with error handling for division by zero.
 ## 🧪 Testing
 
 ### Using MCP Inspector
+
 ```bash
 cd servers/calculator-mcp
 pnpm build
@@ -65,6 +76,7 @@ pnpm inspector
 ```
 
 ### Direct Testing (JSON-RPC)
+
 ```bash
 # List available tools
 echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}' | node dist/index.js
@@ -85,6 +97,7 @@ echo '{"jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": {"name": "di
 ## 📦 Installation & Setup
 
 1. **Build the server:**
+
    ```bash
    cd servers/calculator-mcp
    pnpm install
@@ -92,6 +105,7 @@ echo '{"jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": {"name": "di
    ```
 
 2. **Add to Claude Desktop config:**
+
    ```json
    {
      "mcpServers": {
@@ -113,6 +127,7 @@ echo '{"jsonrpc": "2.0", "id": 5, "method": "tools/call", "params": {"name": "di
 - **Build**: TypeScript compiler
 
 ### File Structure
+
 ```
 servers/calculator-mcp/
 ├── src/
@@ -121,4 +136,4 @@ servers/calculator-mcp/
 ├── package.json          # Dependencies and scripts
 ├── tsconfig.json         # TypeScript configuration
 └── README.md            # This file
-``` 
+```

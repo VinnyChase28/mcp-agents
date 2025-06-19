@@ -23,12 +23,12 @@ export class MCPClientManager {
   private clients = new Map<string, MCPClient>();
   private serverConfigs: MCPServerConfig[] = [
     {
-      name: "calculator",
+      name: "math",
       command: "node",
       args: [
         path.resolve(
           __dirname,
-          "../../../servers/calculator-mcp/dist/index.js",
+          "../../../servers/math-mcp/dist/index.js",
         ),
       ],
     },

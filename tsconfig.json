@@ -1,0 +1,29 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/web"
+    },
+    {
+      "path": "packages/config"
+    },
+    {
+      "path": "packages/shared-types"
+    },
+    {
+      "path": "packages/utils"
+    },
+    {
+      "path": "./servers/api-client-mcp"
+    },
+    {
+      "path": "./servers/file-manager-mcp"
+    },
+    {
+      "path": "./servers/math-mcp"
+    },
+    {
+      "path": "./servers/perplexity-mcp"
+    }
+  ]
+}

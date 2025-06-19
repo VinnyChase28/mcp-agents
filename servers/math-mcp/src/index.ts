@@ -2,12 +2,12 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { registerCalculatorHandlers } from "./handlers.js";
+import { registerMathHandlers } from "./tools.js";
 
-// Create server
+// Create MCP server instance
 const server = new Server(
   {
-    name: "calculator-mcp",
+    name: "advanced-math-mcp",
     version: "1.0.0",
   },
   {
@@ -17,14 +17,14 @@ const server = new Server(
   },
 );
 
-// Register handlers
-registerCalculatorHandlers(server);
+// Register all math tools
+registerMathHandlers(server);
 
 // Start the server
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Calculator MCP server running on stdio");
+  console.error("Advanced Math MCP Server running on stdio");
 }
 
 main().catch(console.error);
