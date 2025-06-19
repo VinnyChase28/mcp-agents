@@ -1,4 +1,4 @@
-import type { ApiResponse, Message } from '@mcp-agents/shared-types';
+import type { ApiResponse, Message } from "@mcp-agents/shared-types";
 
 // String utilities
 export const capitalize = (str: string): string => {
@@ -6,25 +6,25 @@ export const capitalize = (str: string): string => {
 };
 
 export const truncate = (str: string, length: number): string => {
-  return str.length > length ? str.slice(0, length) + '...' : str;
+  return str.length > length ? str.slice(0, length) + "..." : str;
 };
 
 export const slugify = (str: string): string => {
   return str
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 };
 
 // Date utilities
 export const formatDate = (date: Date): string => {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   }).format(date);
 };
 
@@ -32,11 +32,12 @@ export const getRelativeTime = (date: Date): string => {
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  if (diffInSeconds < 60) return 'just now';
+  if (diffInSeconds < 60) return "just now";
   if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-  
+  if (diffInSeconds < 2592000)
+    return `${Math.floor(diffInSeconds / 86400)}d ago`;
+
   return formatDate(date);
 };
 
@@ -45,7 +46,7 @@ export const createApiResponse = <T>(
   success: boolean,
   data?: T,
   error?: string,
-  message?: string
+  message?: string,
 ): ApiResponse<T> => ({
   success,
   data,
@@ -60,8 +61,8 @@ export const generateMessageId = (): string => {
 
 export const createMessage = (
   content: string,
-  role: Message['role'],
-  metadata?: Record<string, unknown>
+  role: Message["role"],
+  metadata?: Record<string, unknown>,
 ): Message => ({
   id: generateMessageId(),
   content,
@@ -86,21 +87,21 @@ export const isValidUrl = (urlString: string): boolean => {
 };
 
 // Object utilities
-export const omit = <T extends Record<string, any>, K extends keyof T>(
+export const omit = <T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
-  keys: K[]
+  keys: K[],
 ): Omit<T, K> => {
   const result = { ...obj };
-  keys.forEach(key => delete result[key]);
+  keys.forEach((key) => delete result[key]);
   return result;
 };
 
-export const pick = <T extends Record<string, any>, K extends keyof T>(
+export const pick = <T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
-  keys: K[]
+  keys: K[],
 ): Pick<T, K> => {
   const result = {} as Pick<T, K>;
-  keys.forEach(key => {
+  keys.forEach((key) => {
     if (key in obj) {
       result[key] = obj[key];
     }
@@ -109,4 +110,4 @@ export const pick = <T extends Record<string, any>, K extends keyof T>(
 };
 
 // MCP Client
-export { McpClient } from './mcp-client.js'; 
+export { MCPClient, getMCPClient } from "./mcp-client.js";

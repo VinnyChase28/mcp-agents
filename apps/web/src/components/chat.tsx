@@ -4,8 +4,8 @@ import { useChat } from "ai/react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardHeader, CardTitle } from "./ui/card";
+import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Send, Bot, User, Wrench } from "lucide-react";
 import { ToolSidebar, type ToolUsage } from "./tool-sidebar";
@@ -59,9 +59,9 @@ export function Chat() {
   }, [messages, isLoading]);
 
   return (
-    <div className="flex gap-6 w-full max-w-7xl mx-auto h-[calc(100vh-8rem)]">
+    <div className="flex gap-6 w-full max-w-7xl mx-auto h-[calc(100vh-8rem)] max-h-[calc(100vh-8rem)]">
       {/* Main Chat Area */}
-      <Card className="flex-1 flex flex-col">
+      <Card className="flex-1 flex flex-col max-h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5" />
@@ -74,8 +74,12 @@ export function Chat() {
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col flex-1 gap-4 p-6">
-          <ScrollArea ref={scrollAreaRef} className="flex-1 pr-4 h-full">
+        {/* Scrollable message area */}
+        <div className="flex-1 min-h-0 flex flex-col gap-4 p-6">
+          <ScrollArea
+            ref={scrollAreaRef}
+            className="flex-1 pr-4 h-full max-h-full"
+          >
             {messages.length === 0 ? (
               <div className="flex items-center justify-center h-full text-muted-foreground text-center">
                 <div>
@@ -180,20 +184,25 @@ export function Chat() {
               </div>
             )}
           </ScrollArea>
-          <Separator />
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <Input
-              value={input}
-              onChange={handleInputChange}
-              placeholder="Ask me to calculate, read files, or make web requests..."
-              disabled={isLoading}
-              className="flex-1"
-            />
-            <Button type="submit" disabled={isLoading || !input.trim()}>
-              <Send className="h-4 w-4" />
-            </Button>
-          </form>
-        </CardContent>
+        </div>
+        <Separator />
+        {/* Chat input bar pinned to bottom */}
+        <form
+          onSubmit={handleSubmit}
+          className="flex gap-2 p-4 border-t bg-background sticky bottom-0 z-10"
+        >
+          <Input
+            value={input}
+            onChange={handleInputChange}
+            placeholder="Ask me to calculate, read files, or make web requests..."
+            disabled={isLoading}
+            className="flex-1"
+            autoFocus
+          />
+          <Button type="submit" disabled={isLoading || !input.trim()}>
+            <Send className="h-4 w-4" />
+          </Button>
+        </form>
       </Card>
 
       {/* Tool Sidebar */}

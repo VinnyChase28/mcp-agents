@@ -2,30 +2,36 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
 // Define tool schemas
 const GetRequestSchema = z.object({
   url: z.string().describe("URL to make GET request to"),
-  headers: z.record(z.string()).optional().describe("Optional headers")
+  headers: z.record(z.string()).optional().describe("Optional headers"),
 });
 
 const PostRequestSchema = z.object({
   url: z.string().describe("URL to make POST request to"),
   body: z.string().describe("Request body"),
-  headers: z.record(z.string()).optional().describe("Optional headers")
+  headers: z.record(z.string()).optional().describe("Optional headers"),
 });
 
 // Create server
-const server = new Server({
-  name: "api-client-mcp",
-  version: "1.0.0"
-}, {
-  capabilities: {
-    tools: {}
-  }
-});
+const server = new Server(
+  {
+    name: "api-client-mcp",
+    version: "1.0.0",
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
+  },
+);
 
 // List tools handler
 server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -34,14 +40,37 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "get_request",
         description: "Make a GET request to a URL",
-        inputSchema: GetRequestSchema
+        inputSchema: {
+          type: "object",
+          properties: {
+            url: { type: "string", description: "URL to make GET request to" },
+            headers: {
+              type: "object",
+              description: "Optional headers",
+              additionalProperties: { type: "string" },
+            },
+          },
+          required: ["url"],
+        },
       },
       {
         name: "post_request",
         description: "Make a POST request to a URL",
-        inputSchema: PostRequestSchema
-      }
-    ]
+        inputSchema: {
+          type: "object",
+          properties: {
+            url: { type: "string", description: "URL to make POST request to" },
+            body: { type: "string", description: "Request body" },
+            headers: {
+              type: "object",
+              description: "Optional headers",
+              additionalProperties: { type: "string" },
+            },
+          },
+          required: ["url", "body"],
+        },
+      },
+    ],
   };
 });
 
@@ -55,22 +84,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       try {
         const response = await fetch(url, {
           method: "GET",
-          headers
+          headers,
         });
-        
+
         const data = await response.text();
-        
+
         return {
-          content: [{
-            type: "text",
-            text: `Status: ${response.status}\nData: ${data}`
-          }]
+          content: [
+            {
+              type: "text",
+              text: `Status: ${response.status}\nData: ${data}`,
+            },
+          ],
         };
       } catch (error) {
         throw new Error(`Failed to make GET request: ${error}`);
       }
     }
-    
+
     case "post_request": {
       const { url, body, headers = {} } = PostRequestSchema.parse(args);
       try {
@@ -78,24 +109,26 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...headers
+            ...headers,
           },
-          body
+          body,
         });
-        
+
         const data = await response.text();
-        
+
         return {
-          content: [{
-            type: "text",
-            text: `Status: ${response.status}\nData: ${data}`
-          }]
+          content: [
+            {
+              type: "text",
+              text: `Status: ${response.status}\nData: ${data}`,
+            },
+          ],
         };
       } catch (error) {
         throw new Error(`Failed to make POST request: ${error}`);
       }
     }
-    
+
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
@@ -108,4 +141,4 @@ async function main() {
   console.error("API Client MCP server running on stdio");
 }
 
-main().catch(console.error); 
+main().catch(console.error);

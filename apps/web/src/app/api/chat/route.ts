@@ -1,26 +1,23 @@
 import { anthropic } from "@ai-sdk/anthropic";
-import { streamText, CoreMessage, tool } from "ai";
+import { streamText, tool } from "ai";
 import { z } from "zod";
-import { McpClient } from "@mcp-agents/utils";
+import { getMCPClient } from "@mcp-agents/utils";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
-// Initialize MCP client
-const mcpClient = new McpClient();
-
 export async function POST(req: Request) {
   try {
-    const { messages }: { messages: CoreMessage[] } = await req.json();
+    const { messages } = await req.json();
+
+    // Initialize MCP client
+    const mcpClient = await getMCPClient();
 
     // Check if API key is configured
     if (!process.env.ANTHROPIC_API_KEY) {
-      return new Response(
-        JSON.stringify({
-          error:
-            "API key not configured. Please set ANTHROPIC_API_KEY in your environment variables.",
-        }),
-        { status: 500, headers: { "Content-Type": "application/json" } },
+      return Response.json(
+        { error: "Anthropic API key not configured" },
+        { status: 500 },
       );
     }
 
@@ -28,14 +25,16 @@ export async function POST(req: Request) {
       model: anthropic("claude-3-5-sonnet-latest"),
       messages,
       system: `You are a helpful AI assistant with access to various tools. You can:
-- Perform mathematical calculations (add, multiply, divide)
-- Read and write files
-- Make HTTP requests
-- List directory contents
-- Search the web for real-time information using Perplexity AI
-- Search academic sources for scholarly information
+              - Perform mathematical calculations (add, multiply, divide)
+              - Read and write files
+              - Make HTTP requests
+              - List directory contents
+              - Search the web for real-time information using Perplexity AI
+              - Search academic sources for scholarly information
 
-When users ask for calculations, file operations, web requests, or need to search for information, use the appropriate tools to help them. After using a tool, explain the results clearly to the user.`,
+      When users ask for calculations, file operations, web requests, or need to search 
+      for information, use the appropriate tools to help them. After using a tool, explain 
+      the results clearly to the user.`,
       tools: {
         add: tool({
           description: "Add two numbers together",
@@ -44,14 +43,12 @@ When users ask for calculations, file operations, web requests, or need to searc
             b: z.number().describe("Second number"),
           }),
           execute: async ({ a, b }) => {
-            const toolCall = {
-              id: `call_${Date.now()}`,
-              name: "add",
-              arguments: { a, b },
-              status: "pending" as const,
-              timestamp: new Date(),
-            };
-            const result = await mcpClient.callTool(toolCall);
+            const result = await mcpClient.callTool("add", { a, b });
+
+            if (!result.success) {
+              throw new Error(result.error || "Tool execution failed");
+            }
+
             return result.result;
           },
         }),
@@ -62,14 +59,12 @@ When users ask for calculations, file operations, web requests, or need to searc
             b: z.number().describe("Second number"),
           }),
           execute: async ({ a, b }) => {
-            const toolCall = {
-              id: `call_${Date.now()}`,
-              name: "multiply",
-              arguments: { a, b },
-              status: "pending" as const,
-              timestamp: new Date(),
-            };
-            const result = await mcpClient.callTool(toolCall);
+            const result = await mcpClient.callTool("multiply", { a, b });
+
+            if (!result.success) {
+              throw new Error(result.error || "Tool execution failed");
+            }
+
             return result.result;
           },
         }),
@@ -80,17 +75,9 @@ When users ask for calculations, file operations, web requests, or need to searc
             b: z.number().describe("Divisor"),
           }),
           execute: async ({ a, b }) => {
-            const toolCall = {
-              id: `call_${Date.now()}`,
-              name: "divide",
-              arguments: { a, b },
-              status: "pending" as const,
-              timestamp: new Date(),
-            };
-            const result = await mcpClient.callTool(toolCall);
+            const result = await mcpClient.callTool("divide", { a, b });
 
-            // Handle errors from MCP client
-            if (result.status === "error") {
+            if (!result.success) {
               throw new Error(result.error || "Tool execution failed");
             }
 
@@ -103,14 +90,12 @@ When users ask for calculations, file operations, web requests, or need to searc
             path: z.string().describe("File path to read"),
           }),
           execute: async ({ path }) => {
-            const toolCall = {
-              id: `call_${Date.now()}`,
-              name: "read_file",
-              arguments: { path },
-              status: "pending" as const,
-              timestamp: new Date(),
-            };
-            const result = await mcpClient.callTool(toolCall);
+            const result = await mcpClient.callTool("read_file", { path });
+
+            if (!result.success) {
+              throw new Error(result.error || "Tool execution failed");
+            }
+
             return result.result;
           },
         }),
@@ -121,14 +106,15 @@ When users ask for calculations, file operations, web requests, or need to searc
             content: z.string().describe("Content to write"),
           }),
           execute: async ({ path, content }) => {
-            const toolCall = {
-              id: `call_${Date.now()}`,
-              name: "write_file",
-              arguments: { path, content },
-              status: "pending" as const,
-              timestamp: new Date(),
-            };
-            const result = await mcpClient.callTool(toolCall);
+            const result = await mcpClient.callTool("write_file", {
+              path,
+              content,
+            });
+
+            if (!result.success) {
+              throw new Error(result.error || "Tool execution failed");
+            }
+
             return result.result;
           },
         }),
@@ -138,14 +124,12 @@ When users ask for calculations, file operations, web requests, or need to searc
             path: z.string().describe("Directory path to list"),
           }),
           execute: async ({ path }) => {
-            const toolCall = {
-              id: `call_${Date.now()}`,
-              name: "list_directory",
-              arguments: { path },
-              status: "pending" as const,
-              timestamp: new Date(),
-            };
-            const result = await mcpClient.callTool(toolCall);
+            const result = await mcpClient.callTool("list_directory", { path });
+
+            if (!result.success) {
+              throw new Error(result.error || "Tool execution failed");
+            }
+
             return result.result;
           },
         }),
@@ -159,14 +143,15 @@ When users ask for calculations, file operations, web requests, or need to searc
               .describe("Optional headers"),
           }),
           execute: async ({ url, headers }) => {
-            const toolCall = {
-              id: `call_${Date.now()}`,
-              name: "get_request",
-              arguments: { url, headers },
-              status: "pending" as const,
-              timestamp: new Date(),
-            };
-            const result = await mcpClient.callTool(toolCall);
+            const result = await mcpClient.callTool("get_request", {
+              url,
+              headers,
+            });
+
+            if (!result.success) {
+              throw new Error(result.error || "Tool execution failed");
+            }
+
             return result.result;
           },
         }),
@@ -181,16 +166,16 @@ When users ask for calculations, file operations, web requests, or need to searc
               .describe("Optional headers"),
           }),
           execute: async ({ url, data, headers }) => {
-            const toolCall = {
-              id: `call_${Date.now()}`,
-              name: "post_request",
-              arguments: { url, data, headers },
-              status: "pending" as const,
-              timestamp: new Date(),
-            };
-            const result = await mcpClient.callTool(toolCall);
+            const result = await mcpClient.callTool("post_request", {
+              url,
+              data,
+              headers,
+            });
 
-            // Handle errors from MCP client
+            if (!result.success) {
+              throw new Error(result.error || "Tool execution failed");
+            }
+
             return result.result;
           },
         }),
@@ -242,26 +227,18 @@ When users ask for calculations, file operations, web requests, or need to searc
             max_tokens,
             temperature,
           }) => {
-            const toolCall = {
-              id: `call_${Date.now()}`,
-              name: "search",
-              arguments: {
-                query,
-                model,
-                search_domain_filter,
-                search_recency_filter,
-                return_images,
-                return_related_questions,
-                max_tokens,
-                temperature,
-              },
-              status: "pending" as const,
-              timestamp: new Date(),
-            };
-            const result = await mcpClient.callTool(toolCall);
+            const result = await mcpClient.callTool("search", {
+              query,
+              model,
+              search_domain_filter,
+              search_recency_filter,
+              return_images,
+              return_related_questions,
+              max_tokens,
+              temperature,
+            });
 
-            // Handle errors from MCP client
-            if (result.status === "error") {
+            if (!result.success) {
               throw new Error(result.error || "Tool execution failed");
             }
 
@@ -283,17 +260,13 @@ When users ask for calculations, file operations, web requests, or need to searc
               .describe("Whether to return related academic questions"),
           }),
           execute: async ({ query, max_tokens, return_related_questions }) => {
-            const toolCall = {
-              id: `call_${Date.now()}`,
-              name: "academic_search",
-              arguments: { query, max_tokens, return_related_questions },
-              status: "pending" as const,
-              timestamp: new Date(),
-            };
-            const result = await mcpClient.callTool(toolCall);
+            const result = await mcpClient.callTool("academic_search", {
+              query,
+              max_tokens,
+              return_related_questions,
+            });
 
-            // Handle errors from MCP client
-            if (result.status === "error") {
+            if (!result.success) {
               throw new Error(result.error || "Tool execution failed");
             }
 
