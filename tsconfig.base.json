@@ -28,8 +28,15 @@
     "baseUrl": ".",
     "paths": {
       "@mcp-agents/shared-types": ["packages/shared-types/src/index"],
+      "@mcp-agents/shared-types/*": ["packages/shared-types/src/*"],
       "@mcp-agents/utils": ["packages/utils/src/index"],
-      "@mcp-agents/config": ["packages/config/index"]
+      "@mcp-agents/utils/*": ["packages/utils/src/*"],
+      "@mcp-agents/config": ["packages/config/index"],
+      "@mcp-agents/config/*": ["packages/config/*"],
+      "@/*": ["./src/*"],
+      "@/apps/*": ["apps/*"],
+      "@/packages/*": ["packages/*"],
+      "@/servers/*": ["servers/*"]
     }
   }
 } 
