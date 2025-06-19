@@ -20,13 +20,13 @@
   },
   "dependencies": {
     "@mcp-agents/shared-types": "workspace:*",
-    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@modelcontextprotocol/sdk": "^1.13.0",
     "ai": "^4.3.16"
   },
   "devDependencies": {
+    "@mcp-agents/config": "workspace:*",
     "@types/node": "^22.0.0",
-    "typescript": "^5.5.4",
-    "@mcp-agents/config": "workspace:*"
+    "typescript": "^5.5.4"
   },
   "license": "MIT"
 }
