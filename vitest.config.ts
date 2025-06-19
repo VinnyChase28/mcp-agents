@@ -23,12 +23,12 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
       "@/packages": resolve(__dirname, "./packages"),
       "@/apps": resolve(__dirname, "./apps"),
-      "@/mcp-agents/shared-types": resolve(
+      "@mcp-agents/shared-types": resolve(
         __dirname,
         "./packages/shared-types/src",
       ),
-      "@/mcp-agents/utils": resolve(__dirname, "./packages/utils/src"),
-      "@/mcp-agents/config": resolve(__dirname, "./packages/config/src"),
+      "@mcp-agents/utils": resolve(__dirname, "./packages/utils/src"),
+      "@mcp-agents/config": resolve(__dirname, "./packages/config/src"),
     },
   },
 });

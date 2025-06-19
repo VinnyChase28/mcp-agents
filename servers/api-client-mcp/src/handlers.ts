@@ -3,7 +3,12 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { GetRequestSchema, PostRequestSchema } from "./schemas.js";
+import {
+  GetRequestSchema,
+  PostRequestSchema,
+  PutRequestSchema,
+  DeleteRequestSchema,
+} from "./schemas.js";
 import { createLogger } from "@mcp-agents/utils";
 import { z } from "zod";
 
@@ -53,6 +58,45 @@ export function registerApiClientHandlers(server: Server) {
             required: ["url", "body"],
           },
         },
+        {
+          name: "put_request",
+          description: "Make a PUT request to a URL",
+          inputSchema: {
+            type: "object",
+            properties: {
+              url: {
+                type: "string",
+                description: "URL to make PUT request to",
+              },
+              body: { type: "string", description: "Request body" },
+              headers: {
+                type: "object",
+                description: "Optional headers",
+                additionalProperties: { type: "string" },
+              },
+            },
+            required: ["url", "body"],
+          },
+        },
+        {
+          name: "delete_request",
+          description: "Make a DELETE request to a URL",
+          inputSchema: {
+            type: "object",
+            properties: {
+              url: {
+                type: "string",
+                description: "URL to make DELETE request to",
+              },
+              headers: {
+                type: "object",
+                description: "Optional headers",
+                additionalProperties: { type: "string" },
+              },
+            },
+            required: ["url"],
+          },
+        },
       ],
     };
   });
@@ -70,6 +114,12 @@ export function registerApiClientHandlers(server: Server) {
           break;
         case "post_request":
           parsedArgs = PostRequestSchema.parse(args);
+          break;
+        case "put_request":
+          parsedArgs = PutRequestSchema.parse(args);
+          break;
+        case "delete_request":
+          parsedArgs = DeleteRequestSchema.parse(args);
           break;
         default:
           logger.error(`Unknown tool: ${name}`);
@@ -110,6 +160,38 @@ export function registerApiClientHandlers(server: Server) {
           });
           const data = await response.text();
           logger.info('POST request successful', { status: response.status });
+          return {
+            content: [{ type: "text", text: `Status: ${response.status}\nData: ${data}` }],
+          };
+        }
+
+        case "put_request": {
+          const { url, body, headers = {} } = parsedArgs as z.infer<typeof PutRequestSchema>;
+          logger.info('Making PUT request', { url, headers });
+          const response = await fetch(url, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              ...headers,
+            },
+            body,
+          });
+          const data = await response.text();
+          logger.info('PUT request successful', { status: response.status });
+          return {
+            content: [{ type: "text", text: `Status: ${response.status}\nData: ${data}` }],
+          };
+        }
+
+        case "delete_request": {
+          const { url, headers = {} } = parsedArgs as z.infer<typeof DeleteRequestSchema>;
+          logger.info('Making DELETE request', { url, headers });
+          const response = await fetch(url, {
+            method: "DELETE",
+            headers,
+          });
+          const data = await response.text();
+          logger.info('DELETE request successful', { status: response.status });
           return {
             content: [{ type: "text", text: `Status: ${response.status}\nData: ${data}` }],
           };

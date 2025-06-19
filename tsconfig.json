@@ -17,9 +17,6 @@
       "path": "./servers/api-client-mcp"
     },
     {
-      "path": "./servers/file-manager-mcp"
-    },
-    {
       "path": "./servers/math-mcp"
     },
     {

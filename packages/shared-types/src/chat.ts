@@ -1,14 +1,6 @@
-import type { ToolCall } from './tools.js';
+import type { Message } from 'ai';
 
-export interface Message {
-  id: string;
-  content: string;
-  role: 'user' | 'assistant' | 'system';
-  timestamp: Date;
-  metadata?: Record<string, unknown>;
-  toolCalls?: ToolCall[];
-}
-
+// Application-specific chat types
 export interface ChatSession {
   id: string;
   title: string;

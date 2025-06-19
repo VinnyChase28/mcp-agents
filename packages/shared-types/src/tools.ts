@@ -1,31 +1,6 @@
 import { z } from "zod";
 
-// Tool-related types and schemas
-export const ToolCallSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  arguments: z.record(z.any()),
-  result: z.any().optional(),
-  status: z.enum(["pending", "success", "error"]).default("pending"),
-  error: z.string().optional(),
-  timestamp: z.date().default(() => new Date()),
-});
-
-export type ToolCall = z.infer<typeof ToolCallSchema>;
-
-export const ToolDefinitionSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  inputSchema: z.object({
-    type: z.literal("object"),
-    properties: z.record(z.any()),
-    required: z.array(z.string()).optional(),
-  }),
-});
-
-export type ToolDefinition = z.infer<typeof ToolDefinitionSchema>;
-
-// New Tool type for MCP client
+// MCP-specific tool types
 export interface Tool {
   name: string;
   description: string;
