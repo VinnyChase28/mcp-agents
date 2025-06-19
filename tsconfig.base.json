@@ -27,16 +27,114 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@mcp-agents/shared-types": ["packages/shared-types/src/index"],
-      "@mcp-agents/shared-types/*": ["packages/shared-types/src/*"],
-      "@mcp-agents/utils": ["packages/utils/src/index"],
-      "@mcp-agents/utils/*": ["packages/utils/src/*"],
-      "@mcp-agents/config": ["packages/config/index"],
-      "@mcp-agents/config/*": ["packages/config/*"],
-      "@/*": ["./src/*"],
-      "@/apps/*": ["apps/*"],
-      "@/packages/*": ["packages/*"],
-      "@/servers/*": ["servers/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@/apps/*": [
+        "apps/*"
+      ],
+      "@/packages/*": [
+        "packages/*"
+      ],
+      "@/servers/*": [
+        "servers/*"
+      ],
+      "@mcp-agents/config": [
+        "packages/config/src/index"
+      ],
+      "@mcp-agents/config/*": [
+        "packages/config/src/*"
+      ],
+      "@/mcp-agents/config": [
+        "packages/config/src/index"
+      ],
+      "@/mcp-agents/config/*": [
+        "packages/config/src/*"
+      ],
+      "@mcp-agents/shared-types": [
+        "packages/shared-types/src/index"
+      ],
+      "@mcp-agents/shared-types/*": [
+        "packages/shared-types/src/*"
+      ],
+      "@/mcp-agents/shared-types": [
+        "packages/shared-types/src/index"
+      ],
+      "@/mcp-agents/shared-types/*": [
+        "packages/shared-types/src/*"
+      ],
+      "@mcp-agents/utils": [
+        "packages/utils/src/index"
+      ],
+      "@mcp-agents/utils/*": [
+        "packages/utils/src/*"
+      ],
+      "@/mcp-agents/utils": [
+        "packages/utils/src/index"
+      ],
+      "@/mcp-agents/utils/*": [
+        "packages/utils/src/*"
+      ],
+      "@mcp-agents/api": [
+        "apps/api/src/index"
+      ],
+      "@mcp-agents/api/*": [
+        "apps/api/src/*"
+      ],
+      "@/mcp-agents/api": [
+        "apps/api/src/index"
+      ],
+      "@/mcp-agents/api/*": [
+        "apps/api/src/*"
+      ],
+      "@mcp-agents/web": [
+        "apps/web/src/index"
+      ],
+      "@mcp-agents/web/*": [
+        "apps/web/src/*"
+      ],
+      "@/mcp-agents/web": [
+        "apps/web/src/index"
+      ],
+      "@/mcp-agents/web/*": [
+        "apps/web/src/*"
+      ],
+      "@mcp-agents/api-client-mcp": [
+        "servers/api-client-mcp/src/index"
+      ],
+      "@mcp-agents/api-client-mcp/*": [
+        "servers/api-client-mcp/src/*"
+      ],
+      "@/mcp-agents/api-client-mcp": [
+        "servers/api-client-mcp/src/index"
+      ],
+      "@/mcp-agents/api-client-mcp/*": [
+        "servers/api-client-mcp/src/*"
+      ],
+      "@mcp-agents/calculator-mcp": [
+        "servers/calculator-mcp/src/index"
+      ],
+      "@mcp-agents/calculator-mcp/*": [
+        "servers/calculator-mcp/src/*"
+      ],
+      "@/mcp-agents/calculator-mcp": [
+        "servers/calculator-mcp/src/index"
+      ],
+      "@/mcp-agents/calculator-mcp/*": [
+        "servers/calculator-mcp/src/*"
+      ],
+      "@mcp-agents/file-manager-mcp": [
+        "servers/file-manager-mcp/src/index"
+      ],
+      "@mcp-agents/file-manager-mcp/*": [
+        "servers/file-manager-mcp/src/*"
+      ],
+      "@/mcp-agents/file-manager-mcp": [
+        "servers/file-manager-mcp/src/index"
+      ],
+      "@/mcp-agents/file-manager-mcp/*": [
+        "servers/file-manager-mcp/src/*"
+      ]
     }
   }
-} 
+}

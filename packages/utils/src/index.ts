@@ -109,4 +109,4 @@ export const pick = <T extends Record<string, any>, K extends keyof T>(
 };
 
 // MCP Client
-export * from './mcp-client.js'; 
+export { McpClient } from './mcp-client.js'; 

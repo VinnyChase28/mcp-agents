@@ -20,8 +20,8 @@ export interface ToolUsage {
   status: 'active' | 'completed' | 'error';
   timestamp: Date;
   duration?: number;
-  arguments?: Record<string, any>;
-  result?: any;
+  arguments?: Record<string, unknown>;
+  result?: unknown;
   error?: string;
 }
 
@@ -87,7 +87,7 @@ function formatDuration(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
-function formatArguments(args: Record<string, any>): string {
+function formatArguments(args: Record<string, unknown>): string {
   const entries = Object.entries(args);
   if (entries.length === 0) return '';
   
@@ -189,7 +189,7 @@ export function ToolSidebar({ toolUsages }: ToolSidebarProps) {
                               </div>
                             )}
                             
-                            {usage.result && usage.status === 'completed' && (
+                            {usage.status === 'completed' && (
                               <div className="text-xs text-green-600 mt-1 p-2 bg-green-50 rounded">
                                 ✓ Completed successfully
                               </div>

@@ -17,7 +17,8 @@
     "dev:api": "turbo run dev --filter @mcp-agents/api",
     "dev:frontend": "turbo run dev --filter @mcp-agents/web",
     "build:packages": "turbo run build --filter='./packages/*'",
-    "start:web": "pnpm dev:web"
+    "start:web": "pnpm dev:web",
+    "generate-paths": "node scripts/generate-path-mappings.js"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
