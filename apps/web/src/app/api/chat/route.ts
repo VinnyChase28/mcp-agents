@@ -1,4 +1,4 @@
-import { google } from "@ai-sdk/google";
+import { anthropic } from "@ai-sdk/anthropic";
 import { streamText } from "ai";
 import { withMCPTools } from "@mcp-agents/utils/mcp-client";
 
@@ -10,9 +10,9 @@ export async function POST(req: Request) {
     const { messages } = await req.json();
 
     // Check if API key is configured
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.ANTHROPIC_API_KEY) {
       return Response.json(
-        { error: "GEMINI_API_KEY not configured" },
+        { error: "Anthropic API key not configured" },
         { status: 500 },
       );
     }
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     // Use the AI SDK MCP integration with proper resource management
     const result = await withMCPTools(async (tools) => {
       return streamText({
-        model: google("gemini-2.5-pro-latest"),
+        model: anthropic("claude-3-5-sonnet-latest"),
         messages,
         system: `You are an expert AI assistant with access to specialized MCP (Model Context Protocol) servers that provide powerful capabilities:
 

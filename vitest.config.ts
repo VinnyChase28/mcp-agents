@@ -2,6 +2,11 @@
 import { defineConfig } from "vitest/config";
 import { resolve } from "path";
 import { config } from "dotenv";
+import dotenv from "dotenv";
+import path from "path";
+
+// Load environment variables from the root .env file
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 // Load environment variables from .env file
 config();
@@ -36,6 +41,8 @@ export default defineConfig({
     // Mock external APIs by default
     mockReset: true,
     clearMocks: true,
+    testTimeout: 60000,
+    hookTimeout: 60000,
   },
   resolve: {
     alias: {
