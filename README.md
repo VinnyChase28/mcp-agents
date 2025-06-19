@@ -120,25 +120,25 @@ To understand how the components work together, here is a step-by-step explanati
 ```mermaid
 sequenceDiagram
     participant User
-    participant Frontend (Next.js App)
-    participant Chat API (/api/chat)
-    participant withMCPTools Helper
-    participant LLM (Anthropic Claude)
-    participant MCP Server (e.g., Math)
+    participant Frontend
+    participant ChatAPI
+    participant MCPHelper
+    participant LLM
+    participant MCPServer
 
-    User->>Frontend (Next.js App): Sends a message (e.g., "What is 2+2?")
-    Frontend (Next.js App)->>Chat API (/api/chat): POST request with message history
-    Chat API (/api/chat)->>withMCPTools Helper: Initializes all MCP clients and aggregates tools
-    withMCPTools Helper->>LLM (Anthropic Claude): Calls streamText() with prompt and all available tools
-    LLM (Anthropic Claude)-->>withMCPTools Helper: Responds with a tool call (e.g., use "evaluate" with expression "2+2")
-    withMCPTools Helper->>MCP Server (e.g., Math): Sends "tools/call" request via stdio transport
-    MCP Server (e.g., Math)-->>MCP Server (e.g., Math): Executes the evaluate("2+2") function
-    MCP Server (e.g., Math)-->>withMCPTools Helper: Returns the result (e.g., "4") via stdio
-    withMCPTools Helper->>LLM (Anthropic Claude): Sends tool result back to the model for interpretation
-    LLM (Anthropic Claude)-->>withMCPTools Helper: Generates a final, user-friendly text response
-    withMCPTools Helper-->>Chat API (/api/chat): Streams the final response back
-    Chat API (/api/chat)-->>Frontend (Next.js App): Streams the response to the client
-    Frontend (Next.js App)-->>User: Renders the final answer ("The result is 4.")
+    User->>Frontend: Sends a message (e.g., "What is 2+2?")
+    Frontend->>ChatAPI: POST request with message history
+    ChatAPI->>MCPHelper: Initializes all MCP clients and aggregates tools
+    MCPHelper->>LLM: Calls streamText() with prompt and all available tools
+    LLM-->>MCPHelper: Responds with a tool call (e.g., use "evaluate" with expression "2+2")
+    MCPHelper->>MCPServer: Sends "tools/call" request via stdio transport
+    MCPServer-->>MCPServer: Executes the evaluate("2+2") function
+    MCPServer-->>MCPHelper: Returns the result (e.g., "4") via stdio
+    MCPHelper->>LLM: Sends tool result back to the model for interpretation
+    LLM-->>MCPHelper: Generates a final, user-friendly text response
+    MCPHelper-->>ChatAPI: Streams the final response back
+    ChatAPI-->>Frontend: Streams the response to the client
+    Frontend-->>User: Renders the final answer ("The result is 4.")
 ```
 
 <br/>
